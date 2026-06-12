@@ -16,7 +16,7 @@ from impactlens.utils.anonymization import anonymize_name
 from impactlens.utils.workflow_utils import MIN_PHASES_FOR_COMPARISON
 
 # Documentation URL constant
-METRICS_GUIDE_URL = "https://github.com/testcara/impactlens/blob/master/docs/METRICS_GUIDE.md"
+METRICS_GUIDE_URL = "https://github.com/janaki29/impactlens/blob/master/docs/METRICS_GUIDE.md"
 
 
 def save_report_output(

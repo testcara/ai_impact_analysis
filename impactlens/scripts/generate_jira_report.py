@@ -28,6 +28,7 @@ from impactlens.utils.workflow_utils import (
     load_members_from_yaml,
     aggregate_member_values_for_phases,
 )
+from impactlens.utils.date_utils import get_monthly_phases
 from impactlens.utils.report_utils import (
     normalize_username,
     combine_comparison_reports,
@@ -238,7 +239,7 @@ Examples:
     if result is None:
         return 1
 
-    phases, default_assignee, reports_dir, project_settings = result
+    phases, default_assignee, reports_dir, project_settings, root_configs = result
     config_file = custom_config_file if custom_config_file else default_config_file
     # Handle --combine-only flag
     if args.combine_only:
@@ -404,8 +405,82 @@ Examples:
     if result != 0:
         return result
 
+    # Monthly comparison: generate a separate prev-month vs current-month report
+    if root_configs.get("monthly_comparison") and not assignee and not args.all_members:
+        _run_jira_monthly_comparison(
+            config_file=config_file,
+            custom_config_file=custom_config_file,
+            reports_dir=reports_dir,
+            hide_individual_names=args.hide_individual_names,
+            no_upload=args.no_upload,
+            comparison_reference_date=root_configs.get("comparison_reference_date"),
+        )
+
     print(f"{Colors.GREEN}Done!{Colors.NC}")
     return 0
+
+
+def _run_jira_monthly_comparison(
+    config_file: Path,
+    custom_config_file: Optional[Path],
+    reports_dir: Path,
+    hide_individual_names: bool,
+    no_upload: bool,
+    comparison_reference_date: Optional[str] = None,
+) -> None:
+    """Generate a Previous Month vs Current Month Jira comparison report."""
+    from datetime import date as _date
+    ref_date = None
+    if comparison_reference_date:
+        try:
+            ref_date = _date.fromisoformat(comparison_reference_date)
+        except ValueError:
+            print(f"{Colors.YELLOW}  ⚠ Invalid comparison_reference_date '{comparison_reference_date}', using today{Colors.NC}")
+    monthly_phases = get_monthly_phases(ref_date)
+    monthly_dir = reports_dir / "monthly"
+    monthly_dir.mkdir(parents=True, exist_ok=True)
+
+    print()
+    print(f"{Colors.BLUE}{'=' * 40}{Colors.NC}")
+    print(f"{Colors.BLUE}Monthly Comparison (Jira){Colors.NC}")
+    print(f"{Colors.BLUE}{'=' * 40}{Colors.NC}")
+
+    for phase_name, start_date, end_date in monthly_phases:
+        print(f"{Colors.YELLOW}  Fetching '{phase_name}' ({start_date} → {end_date})...{Colors.NC}")
+        success = generate_phase_report(
+            phase_name=phase_name,
+            start_date=start_date,
+            end_date=end_date,
+            config_file=config_file,
+            output_dir=str(monthly_dir),
+            hide_individual_names=hide_individual_names,
+        )
+        if success:
+            print(f"{Colors.GREEN}  ✓ '{phase_name}' done{Colors.NC}")
+        else:
+            print(f"{Colors.YELLOW}  ⚠ '{phase_name}' failed, skipping monthly comparison{Colors.NC}")
+            return
+
+    # Generate the comparison TSV from the monthly JSON files
+    success = generate_comparison_report(
+        output_dir=str(monthly_dir),
+        config_file=config_file,
+        hide_individual_names=hide_individual_names,
+    )
+    if not success:
+        print(f"{Colors.YELLOW}  ⚠ Monthly comparison report generation failed{Colors.NC}")
+        return
+
+    # Upload the monthly comparison TSV to Google Sheets
+    monthly_tsvs = sorted(monthly_dir.glob("jira_comparison_general_*.tsv"), reverse=True)
+    if monthly_tsvs:
+        latest = monthly_tsvs[0]
+        print(f"{Colors.GREEN}  ✓ Monthly comparison report: {latest.name}{Colors.NC}")
+        upload_to_google_sheets(latest, skip_upload=no_upload, config_path=custom_config_file)
+    else:
+        print(f"{Colors.YELLOW}  ⚠ No monthly comparison TSV found{Colors.NC}")
+
+    print()
 
 
 if __name__ == "__main__":

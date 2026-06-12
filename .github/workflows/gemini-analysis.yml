@@ -3,6 +3,9 @@ name: Gemini AI Analysis
 # Manual trigger workflow for running Gemini analysis on existing reports
 # Use this to analyze reports that have already been generated
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   workflow_dispatch:
     inputs:

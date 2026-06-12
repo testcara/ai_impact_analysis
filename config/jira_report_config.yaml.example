@@ -73,6 +73,17 @@ output_dir: "reports/jira"
 # When disabled: Skips prompt and analysis generation (faster processing, no API costs)
 # no_ai_analysis: true
 
+# Monthly Comparison (optional)
+# When enabled, generates an additional report comparing two consecutive months,
+# uploaded as a separate "Monthly Comparison" tab in Google Sheets.
+# monthly_comparison: true
+#
+# By default, compares the previous calendar month with the current month (up to today).
+# To pin comparison to a specific pair (e.g. April vs May), set comparison_reference_date
+# to the last day of the later month:
+#   comparison_reference_date: "2026-05-31"  # → April 2026 vs May 2026
+# Leave unset (or omit) to always compare the two most recent months automatically.
+
 # Google Sheets settings (optional)
 # google_spreadsheet_id: ""  # Google Spreadsheet ID for report upload
 # If you do not set in Config PR, reports would be uploaded to the default google-sheet by CI.

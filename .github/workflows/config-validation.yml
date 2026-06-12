@@ -1,5 +1,8 @@
 name: Config-Only PR - Block Merge
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   pull_request_target:
     branches: [ master ]

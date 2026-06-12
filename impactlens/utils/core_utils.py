@@ -473,6 +473,11 @@ def generate_sheet_name_from_report(report_path: str, config_path: str = None) -
         sheet_name = "Jira Report - Aggregated"
     elif filename.startswith("aggregated_pr_report"):
         sheet_name = "PR Report - Aggregated"
+    # Check if it's a monthly comparison report (stored in monthly/ subdirectory)
+    elif "monthly" in str(Path(report_path).parent).lower() and filename.startswith("jira_comparison_"):
+        sheet_name = "Jira Report - Monthly Comparison"
+    elif "monthly" in str(Path(report_path).parent).lower() and filename.startswith("pr_comparison_"):
+        sheet_name = "PR Report - Monthly Comparison"
     # Check if it's an AI analysis report (gemini_analysis_* or ai_analysis_*)
     elif filename.startswith("gemini_analysis_combined") or filename.startswith(
         "ai_analysis_combined"

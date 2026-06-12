@@ -64,7 +64,7 @@ class ConfigValidator:
             # output_dir is optional - defaults to "reports"
         },
         'pr_report_config.yaml': {
-            'project': ['github_repo_owner', 'github_repo_name'],
+            'project': ['git_repo_owner', 'git_repo_name'],
             'phases': True,
             'members': True,
             # output_dir is optional - defaults to "reports"
@@ -93,11 +93,15 @@ class ConfigValidator:
         'spreadsheet_id',
         'jira_url',
         'github_url',
+        'git_url',
         'github_repo_owner',
         'github_repo_name',
+        'git_repo_owner',
+        'git_repo_name',
         'jira_project_key',
         'name',
         'github_username',
+        'git_username',
         'email',
         'description',
         'leave_days',
@@ -105,6 +109,15 @@ class ConfigValidator:
         'start',
         'end',
         'projects',
+        'monthly_comparison',
+        'monthly_trend',
+        'trend_months',
+        'comparison_reference_date',
+        'no_ai_analysis',
+        'replace_existing_reports',
+        'visualization',
+        'email_anonymous_id',
+        'log_level',
     ]
 
     def __init__(self, strict: bool = True):

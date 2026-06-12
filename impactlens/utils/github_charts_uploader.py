@@ -155,7 +155,7 @@ def upload_file_to_github(
 
 def upload_charts_to_github(
     chart_files: List[str],
-    repo: str = "testcara/impactlens-charts",
+    repo: str = "janaki29/impactlens-charts",
     team_name: str = "unknown",
     report_type: str = "charts",
     branch_name: Optional[str] = None,

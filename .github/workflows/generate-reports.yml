@@ -1,5 +1,8 @@
 name: Generate AI Impact Reports
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   # Trigger ONLY when user config files are modified in PRs (excludes test configs)
   # Using pull_request_target to allow fork PRs to access secrets

@@ -187,7 +187,7 @@ def load_and_resolve_config(
     default_config_path: Path,
     default_reports_dir: Path,
     config_type: str = "config",
-) -> Optional[Tuple[List[Tuple[str, str, str]], str, Path, Dict[str, Any]]]:
+) -> Optional[Tuple[List[Tuple[str, str, str]], str, Path, Dict[str, Any], Dict[str, Any]]]:
     """
     Validate, load config file, and resolve output directory.
 
@@ -200,8 +200,8 @@ def load_and_resolve_config(
         config_type: Type of config for error messages (e.g., "PR config", "Jira config")
 
     Returns:
-        Tuple of (phases, default_assignee_or_author, reports_dir, project_settings) if successful,
-        None if validation fails
+        Tuple of (phases, default_assignee_or_author, reports_dir, project_settings, root_configs)
+        if successful, None if validation fails
 
     Note:
         Prints error messages and returns None on validation or loading errors.
@@ -235,7 +235,7 @@ def load_and_resolve_config(
     phases = root_configs["phases"]
     default_assignee_or_author = root_configs["default_assignee"]
 
-    return phases, default_assignee_or_author, reports_dir, project_settings
+    return phases, default_assignee_or_author, reports_dir, project_settings, root_configs
 
 
 def load_config_file(
@@ -351,6 +351,10 @@ def load_config_file(
     root_configs["email_anonymous_id"] = config.get("email_anonymous_id", None)
     root_configs["log_level"] = config.get("log_level", None)
     root_configs["members"] = config.get("members", [])
+    root_configs["monthly_comparison"] = config.get("monthly_comparison", False)
+    root_configs["comparison_reference_date"] = config.get("comparison_reference_date", None)
+    root_configs["monthly_trend"] = config.get("monthly_trend", False)
+    root_configs["trend_months"] = int(config.get("trend_months", 2))
 
     # Apply log_level from config if specified
     if root_configs["log_level"]:
